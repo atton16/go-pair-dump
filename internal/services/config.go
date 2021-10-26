@@ -3,6 +3,7 @@ package services
 import (
 	"io/ioutil"
 	"log"
+	"net/url"
 	"sync"
 
 	"gopkg.in/yaml.v2"
@@ -59,4 +60,20 @@ func GetConfig() *Config {
 		myConfig = &config
 	})
 	return myConfig
+}
+
+func (c *Config) Redact() Config {
+	var copyOf = *c
+	u, _ := url.Parse(copyOf.Mongo.URL)
+	if u.User != nil {
+		p, _ := u.User.Password()
+		if p != "" {
+			u.User = url.UserPassword(u.User.Username(), "REDACTED")
+		}
+		copyOf.Mongo.URL = u.String()
+	}
+	if copyOf.Notification.RedisPassword != "" {
+		copyOf.Notification.RedisPassword = "REDACTED"
+	}
+	return copyOf
 }

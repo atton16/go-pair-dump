@@ -26,7 +26,7 @@ func main() {
 
 	// Get config
 	var config = services.GetConfig()
-	txt, _ = json.MarshalIndent(config, "", "  ")
+	txt, _ = json.MarshalIndent(config.Redact(), "", "  ")
 	log.Printf("config: %s\n", txt)
 
 	// Main context
