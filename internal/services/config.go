@@ -1,0 +1,62 @@
+package services
+
+import (
+	"io/ioutil"
+	"log"
+	"sync"
+
+	"gopkg.in/yaml.v2"
+)
+
+var configOnce sync.Once
+var myConfig *Config
+
+type Config struct {
+	Pairdump struct {
+		QuoteAssets []string `yaml:"quoteAssets"`
+		Klines      struct {
+			Interval string `yaml:"interval"`
+			Limit    int    `yaml:"limit"`
+		} `yaml:"klines"`
+		Progress struct {
+			Interval int64 `yaml:"interval"`
+		} `yaml:"progress"`
+	} `yaml:"pairdump"`
+	Binance struct {
+		ApiURL string `yaml:"apiURL"`
+	} `yaml:"binance"`
+	Mongo struct {
+		URL              string `yaml:"url"`
+		DB               string `yaml:"db"`
+		KlinesCollection string `yaml:"klinesCollection"`
+		KlinesIndexName  string `yaml:"klinesIndexName"`
+	} `yaml:"mongo"`
+	Notification struct {
+		Enable        bool   `yaml:"enable"`
+		RedisAddr     string `yaml:"redisAddr"`
+		RedisDB       int    `yaml:"redisDB"`
+		RedisUsername string `yaml:"redisUsername"`
+		RedisPassword string `yaml:"redisPassword"`
+		Channel       string `yaml:"channel"`
+	} `yaml:"notification"`
+}
+
+func GetConfig() *Config {
+	configOnce.Do(func() {
+		args := GetArgs()
+		content, err := ioutil.ReadFile(args.Config)
+
+		if err != nil {
+			log.Fatalf("error: %v", err)
+		}
+
+		var config Config
+		err = yaml.Unmarshal(content, &config)
+		if err != nil {
+			log.Fatalf("error: %v", err)
+		}
+
+		myConfig = &config
+	})
+	return myConfig
+}

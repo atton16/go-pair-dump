@@ -1,0 +1,30 @@
+pairdump:
+  quoteAssets:
+  - USDT
+  - USDC
+  - BUSD
+  - DAI
+  klines:
+    interval: "1d"
+    limit: 1000
+  progress:
+    interval: 30
+binance:
+  apiURL: "https://api.binance.com/"
+mongo:
+  url: "mongodb://127.0.0.1:27017"
+  db: "pairdump-test"
+  # collection name for dumping klines
+  klinesCollection: "klines"
+  # index name for compound index(symbol, interval, opentime)
+  klinesIndexName: "symbol_interval_openTime"
+notification:
+  enable: true
+  redisAddr: 127.0.0.1:6379
+  redisDB: 0
+  # redis username, leave blank if not specified
+  redisUsername: ""
+  # redis password, leave blank if not specified
+  redisPassword: ""
+  # redis publish channel for notification
+  channel: "pairdump"
