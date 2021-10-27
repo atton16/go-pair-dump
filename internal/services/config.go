@@ -14,8 +14,8 @@ var myConfig *Config
 
 type Config struct {
 	Pairdump struct {
-		QuoteAssets []string `yaml:"quoteAssets"`
-		Klines      struct {
+		FilterPattern string `yaml:"filterPattern"`
+		Klines        struct {
 			Interval string `yaml:"interval"`
 			Limit    int    `yaml:"limit"`
 		} `yaml:"klines"`

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"strings"
+	"regexp"
 	"time"
 
 	"github.com/atton16/go-pair-dump/internal/services"
@@ -44,13 +44,11 @@ func GetSymbols(ctx context.Context) *[]string {
 		log.Fatalf("error: %v", err)
 	}
 	// log.Printf("exchangeInfo: %+v\n", data)
+	var filterPattern = regexp.MustCompile(config.Pairdump.FilterPattern)
 	var symbols []string
 	for _, symbol := range data.Symbols {
-		for _, quoteAsset := range config.Pairdump.QuoteAssets {
-			if strings.HasSuffix(symbol.Symbol, quoteAsset) {
-				symbols = append(symbols, symbol.Symbol)
-				break
-			}
+		if filterPattern.MatchString(symbol.Symbol) {
+			symbols = append(symbols, symbol.Symbol)
 		}
 	}
 	return &symbols

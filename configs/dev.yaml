@@ -1,9 +1,6 @@
 pairdump:
-  quoteAssets:
-  - USDT
-  - USDC
-  - BUSD
-  - DAI
+  # filter pattern in regular expression
+  filterPattern: USDT$|USDC$|BUSD$|DAI$
   klines:
     interval: "1d"
     limit: 1000
