@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"regexp"
 	"time"
@@ -11,36 +10,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type PairdumpState string
-type PairdumpError string
-
-const (
-	StateStart PairdumpState = "start"
-	StateDone  PairdumpState = "done"
-	StateError PairdumpState = "error"
-)
-
-const (
-	ErrorGetSymbols  PairdumpError = "GetSymbols"
-	ErrorGetKlines   PairdumpError = "GetKlines"
-	ErrorEnsureIndex PairdumpError = "EnsureIndex"
-	ErrorBulkWrite   PairdumpError = "BulkWrite"
-)
-
-func (state PairdumpState) MarshalBinary() ([]byte, error) {
-	return []byte(state), nil
-}
-
-func (state PairdumpError) MarshalBinary() ([]byte, error) {
-	return []byte(state), nil
-}
-
 func GetSymbols(ctx context.Context) *[]string {
 	var config = services.GetConfig()
 	var binance = services.GetBinance()
 	data, err := binance.ExchangeInfo()
 	if err != nil {
-		NotifyError(ctx, ErrorGetSymbols)
+		NotifyError(ctx, AppGetSymbols, err)
 		log.Fatalf("error: %v", err)
 	}
 	// log.Printf("exchangeInfo: %+v\n", data)
@@ -61,7 +36,7 @@ func GetKlines(ctx context.Context, symbol string, interval services.BinanceKlin
 	}
 	data, err := binance.Klines(symbol, interval, &opts)
 	if err != nil {
-		NotifyError(ctx, ErrorGetKlines)
+		NotifyError(ctx, AppGetKlines, err)
 		log.Fatalf("error: %v", err)
 	}
 	return data
@@ -100,25 +75,4 @@ func EnsureIndex(ctx context.Context, col string, name string, model mongo.Index
 		return &indexResult, nil
 	}
 	return nil, nil
-}
-
-func NotifyOK(ctx context.Context, state PairdumpState) {
-	var config = services.GetConfig()
-	var rd = services.GetRedis()
-	if config.Notification.Enable {
-		log.Printf("notification: NotifyOK -> %s\n", state)
-		result, err := rd.Publish(ctx, config.Notification.Channel, state)
-		log.Printf("notification: NotifyOK -> result=%d, error=%v", result, err)
-	}
-}
-
-func NotifyError(ctx context.Context, err PairdumpError) {
-	var config = services.GetConfig()
-	var rd = services.GetRedis()
-	if config.Notification.Enable {
-		txt := fmt.Sprintf("%s:%s", StateError, err)
-		log.Printf("notification: NotifyError -> %s\n", txt)
-		result, err := rd.Publish(ctx, config.Notification.Channel, txt)
-		log.Printf("notification: NotifyError -> result=%d, error=%v", result, err)
-	}
 }

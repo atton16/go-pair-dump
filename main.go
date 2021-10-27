@@ -39,7 +39,7 @@ func main() {
 		log.Println("notification: enabled")
 		rd.Connect(ctx)
 		defer rd.Close()
-		app.NotifyOK(ctx, app.StateStart)
+		app.NotifyOK(ctx, app.StatusStart)
 	} else {
 		log.Println("notification: disabled")
 	}
@@ -61,7 +61,7 @@ func main() {
 	log.Printf("ensureIndex: ensuring index %s...\n", config.Mongo.KlinesIndexName)
 	indexCreated, err := app.EnsureIndex(ctx, config.Mongo.KlinesCollection, config.Mongo.KlinesIndexName, indexModel)
 	if err != nil {
-		app.NotifyError(ctx, app.ErrorEnsureIndex)
+		app.NotifyError(ctx, app.AppEnsureIndex, err)
 		log.Fatalf("error: %v", err)
 	}
 	if indexCreated == nil {
@@ -122,7 +122,7 @@ func main() {
 		// BulkWrite
 		result, err := mongoSvc.BulkWrite(ctx, config.Mongo.KlinesCollection, bulkWriteModels)
 		if err != nil {
-			app.NotifyError(ctx, app.ErrorBulkWrite)
+			app.NotifyError(ctx, app.AppBulkWrite, err)
 			log.Fatalf("error: %v", err)
 		}
 		// log.Printf("%+v", result)
@@ -133,7 +133,7 @@ func main() {
 	elapsed := time.Since(start)
 	log.Printf("upsert: MatchedCount=%d, UpsertedCount=%d\n", matchedCount, upsertedCount)
 	log.Printf("total klines: %d\n", klinesCount)
-	app.NotifyOK(ctx, app.StateDone)
+	app.NotifyOK(ctx, app.StatusDone)
 	log.Printf("Process took %s", elapsed)
 	log.Println("Done")
 }
