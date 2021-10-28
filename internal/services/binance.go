@@ -122,6 +122,8 @@ type BinanceKline struct {
 	NumberOfTrades           int64     `bson:"numberOfTrades"`
 	TakerBuyBaseAssetVolume  float64   `bson:"takerBuyBaseAssetVolume"`
 	TakerBuyQuoteAssetVolume float64   `bson:"takerBuyQuoteAssetVolume"`
+	CreatedAt                time.Time `bson:"createdAt"`
+	UpdatedAt                time.Time `bson:"updatedAt"`
 	// Ignore                   string    `bson:"ignore"`
 }
 
@@ -143,6 +145,9 @@ func (k *BinanceKline) UnmarshalJSON(bs []byte) error {
 	k.NumberOfTrades = int64(arr[8].(float64))
 	k.TakerBuyBaseAssetVolume, _ = strconv.ParseFloat(arr[9].(string), 64)
 	k.TakerBuyQuoteAssetVolume, _ = strconv.ParseFloat(arr[10].(string), 64)
+	now := time.Now()
+	k.CreatedAt = now
+	k.UpdatedAt = now
 	// k.Ignore = arr[11].(string)
 	return nil
 }
