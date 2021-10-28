@@ -56,10 +56,10 @@ func main() {
 			primitive.E{Key: "interval", Value: 1},
 			primitive.E{Key: "openTime", Value: 1},
 		},
-		Options: options.Index().SetUnique(true).SetName(config.Mongo.KlinesIndexName),
+		Options: options.Index().SetUnique(true).SetName(config.Mongo.Binance.KlinesIndexName),
 	}
-	log.Printf("ensureIndex: ensuring index %s...\n", config.Mongo.KlinesIndexName)
-	indexCreated, err := app.EnsureIndex(ctx, config.Mongo.KlinesCollection, config.Mongo.KlinesIndexName, indexModel)
+	log.Printf("ensureIndex: ensuring index %s...\n", config.Mongo.Binance.KlinesIndexName)
+	indexCreated, err := app.EnsureIndex(ctx, config.Mongo.Binance.KlinesCollection, config.Mongo.Binance.KlinesIndexName, indexModel)
 	if err != nil {
 		app.NotifyError(ctx, app.AppEnsureIndex, err)
 		log.Fatalf("error: %v", err)
@@ -120,7 +120,7 @@ func main() {
 			bulkWriteModels = append(bulkWriteModels, updateOne)
 		}
 		// BulkWrite
-		result, err := mongoSvc.BulkWrite(ctx, config.Mongo.KlinesCollection, bulkWriteModels)
+		result, err := mongoSvc.BulkWrite(ctx, config.Mongo.Binance.KlinesCollection, bulkWriteModels)
 		if err != nil {
 			app.NotifyError(ctx, app.AppBulkWrite, err)
 			log.Fatalf("error: %v", err)

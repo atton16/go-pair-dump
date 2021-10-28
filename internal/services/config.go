@@ -27,10 +27,16 @@ type Config struct {
 		ApiURL string `yaml:"apiURL"`
 	} `yaml:"binance"`
 	Mongo struct {
+		URL     string `yaml:"url"`
+		DB      string `yaml:"db"`
+		Binance struct {
 		URL              string `yaml:"url"`
 		DB               string `yaml:"db"`
 		KlinesCollection string `yaml:"klinesCollection"`
 		KlinesIndexName  string `yaml:"klinesIndexName"`
+			KlinesCollection  string `yaml:"klinesCollection"`
+			KlinesIndexName   string `yaml:"klinesIndexName"`
+		} `yaml:"binance"`
 	} `yaml:"mongo"`
 	Notification struct {
 		Enable        bool   `yaml:"enable"`

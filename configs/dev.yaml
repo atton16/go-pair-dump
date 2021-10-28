@@ -11,10 +11,11 @@ binance:
 mongo:
   url: "mongodb://127.0.0.1:27017"
   db: "pairdump-test"
-  # collection name for dumping klines
-  klinesCollection: "klines"
-  # index name for compound index(symbol, interval, opentime)
-  klinesIndexName: "symbol_interval_openTime"
+  binance:
+    # collection name for dumping klines
+    klinesCollection: "binance_klines"
+    # index name for compound index(symbol, interval, opentime)
+    klinesIndexName: "symbol_interval_openTime"
 notification:
   enable: true
   redisAddr: 127.0.0.1:6379
