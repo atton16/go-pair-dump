@@ -30,10 +30,8 @@ type Config struct {
 		URL     string `yaml:"url"`
 		DB      string `yaml:"db"`
 		Binance struct {
-		URL              string `yaml:"url"`
-		DB               string `yaml:"db"`
-		KlinesCollection string `yaml:"klinesCollection"`
-		KlinesIndexName  string `yaml:"klinesIndexName"`
+			SymbolsCollection string `yaml:"symbolsCollection"`
+			SymbolsIndexName  string `yaml:"symbolsIndexName"`
 			KlinesCollection  string `yaml:"klinesCollection"`
 			KlinesIndexName   string `yaml:"klinesIndexName"`
 		} `yaml:"binance"`

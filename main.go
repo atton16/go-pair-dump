@@ -49,8 +49,27 @@ func main() {
 	mongoSvc.Connect(ctx)
 	defer mongoSvc.Disconnect(ctx)
 
-	// Ensure index
+	// Ensure index on symbol collection
 	indexModel := mongo.IndexModel{
+		Keys: bson.D{
+			primitive.E{Key: "symbol", Value: 1},
+		},
+		Options: options.Index().SetUnique(true).SetName(config.Mongo.Binance.SymbolsIndexName),
+	}
+	log.Printf("ensureIndex: ensuring index %s...\n", config.Mongo.Binance.SymbolsIndexName)
+	indexCreated, err := app.EnsureIndex(ctx, config.Mongo.Binance.SymbolsCollection, config.Mongo.Binance.SymbolsIndexName, indexModel)
+	if err != nil {
+		app.NotifyError(ctx, app.AppEnsureIndex, err)
+		log.Fatalf("error: %v", err)
+	}
+	if indexCreated == nil {
+		log.Println("ensureIndex: index already exists, do nothing.")
+	} else {
+		log.Println("ensureIndex: index created!")
+	}
+
+	// Ensure index on klines collection
+	indexModel = mongo.IndexModel{
 		Keys: bson.D{
 			primitive.E{Key: "symbol", Value: 1},
 			primitive.E{Key: "interval", Value: 1},
@@ -59,7 +78,7 @@ func main() {
 		Options: options.Index().SetUnique(true).SetName(config.Mongo.Binance.KlinesIndexName),
 	}
 	log.Printf("ensureIndex: ensuring index %s...\n", config.Mongo.Binance.KlinesIndexName)
-	indexCreated, err := app.EnsureIndex(ctx, config.Mongo.Binance.KlinesCollection, config.Mongo.Binance.KlinesIndexName, indexModel)
+	indexCreated, err = app.EnsureIndex(ctx, config.Mongo.Binance.KlinesCollection, config.Mongo.Binance.KlinesIndexName, indexModel)
 	if err != nil {
 		app.NotifyError(ctx, app.AppEnsureIndex, err)
 		log.Fatalf("error: %v", err)
@@ -73,6 +92,33 @@ func main() {
 	// Get symbols
 	var symbols *[]string = app.GetSymbols(ctx)
 	// log.Printf("symbols: %+v\n", symbols)
+	log.Printf("fetched symbols: %d\n", len(*symbols))
+
+	log.Println("Start dumping symbols...")
+	var bulkWriteModels []mongo.WriteModel
+	for _, symbol := range *symbols {
+		updateOne := mongo.NewUpdateOneModel()
+		updateOne.SetFilter(bson.M{
+			"symbol": symbol,
+		})
+		now := time.Now()
+		updateOne.SetUpdate(bson.M{
+			"$setOnInsert": bson.M{
+				"symbol":    symbol,
+				"createdAt": now,
+				"updatedAt": now,
+			},
+		})
+		updateOne.SetUpsert(true)
+		bulkWriteModels = append(bulkWriteModels, updateOne)
+	}
+	// BulkWrite symbols
+	result, err := mongoSvc.BulkWrite(ctx, config.Mongo.Binance.SymbolsCollection, bulkWriteModels)
+	if err != nil {
+		app.NotifyError(ctx, app.AppBulkWrite, err)
+		log.Fatalf("error: %v", err)
+	}
+	log.Printf("upsert: MatchedCount=%d, UpsertedCount=%d\n", result.MatchedCount, result.UpsertedCount)
 	log.Printf("total symbols: %d\n", len(*symbols))
 
 	log.Printf("Start dumping klines for %d symbols, this might take a while...\n", len(*symbols))

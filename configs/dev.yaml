@@ -12,6 +12,10 @@ mongo:
   url: "mongodb://127.0.0.1:27017"
   db: "pairdump-test"
   binance:
+    # collection name for dumping symbols
+    symbolsCollection: "binance_symbols"
+    # index name for compound
+    symbolsIndexName: "symbol"
     # collection name for dumping klines
     klinesCollection: "binance_klines"
     # index name for compound index(symbol, interval, opentime)
