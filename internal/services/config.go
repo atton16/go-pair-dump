@@ -13,7 +13,8 @@ var configOnce sync.Once
 var myConfig *Config
 
 type Config struct {
-	Pairdump struct {
+	Binance struct {
+		ApiURL        string `yaml:"apiURL"`
 		FilterPattern string `yaml:"filterPattern"`
 		Klines        struct {
 			Interval string `yaml:"interval"`
@@ -22,9 +23,6 @@ type Config struct {
 		Progress struct {
 			Interval int64 `yaml:"interval"`
 		} `yaml:"progress"`
-	} `yaml:"pairdump"`
-	Binance struct {
-		ApiURL string `yaml:"apiURL"`
 	} `yaml:"binance"`
 	Mongo struct {
 		URL     string `yaml:"url"`

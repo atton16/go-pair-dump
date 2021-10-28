@@ -122,14 +122,14 @@ func main() {
 	log.Printf("total symbols: %d\n", len(*symbols))
 
 	log.Printf("Start dumping klines for %d symbols, this might take a while...\n", len(*symbols))
-	log.Printf("Progress report every %d seconds.", config.Pairdump.Progress.Interval)
+	log.Printf("Progress report every %d seconds.", config.Binance.Progress.Interval)
 	klinesCount := 0
 	matchedCount := int64(0)
 	upsertedCount := int64(0)
 
 	progressCtx, progressCancel := context.WithCancel(context.Background())
 	go func(ctx context.Context) {
-		ticker := time.NewTicker(time.Duration(config.Pairdump.Progress.Interval) * time.Second)
+		ticker := time.NewTicker(time.Duration(config.Binance.Progress.Interval) * time.Second)
 		for {
 			select {
 			case <-ctx.Done():
@@ -144,8 +144,8 @@ func main() {
 		var klines []services.BinanceKline = app.GetKlines(
 			ctx,
 			symbol,
-			services.BinanceKlineInterval(config.Pairdump.Klines.Interval),
-			config.Pairdump.Klines.Limit,
+			services.BinanceKlineInterval(config.Binance.Klines.Interval),
+			config.Binance.Klines.Limit,
 		)
 		klines = app.KlinesWithoutUnclosedKline(klines)
 		klinesCount += len(klines)

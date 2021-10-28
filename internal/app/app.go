@@ -19,7 +19,7 @@ func GetSymbols(ctx context.Context) *[]string {
 		log.Fatalf("error: %v", err)
 	}
 	// log.Printf("exchangeInfo: %+v\n", data)
-	var filterPattern = regexp.MustCompile(config.Pairdump.FilterPattern)
+	var filterPattern = regexp.MustCompile(config.Binance.FilterPattern)
 	var symbols []string
 	for _, symbol := range data.Symbols {
 		if filterPattern.MatchString(symbol.Symbol) {

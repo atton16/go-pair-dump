@@ -1,4 +1,5 @@
-pairdump:
+binance:
+  apiURL: "https://api.binance.com/"
   # filter pattern in regular expression
   filterPattern: USDT$|USDC$|BUSD$|DAI$
   klines:
@@ -6,8 +7,6 @@ pairdump:
     limit: 1000
   progress:
     interval: 30
-binance:
-  apiURL: "https://api.binance.com/"
 mongo:
   url: "mongodb://127.0.0.1:27017"
   db: "pairdump-test"
